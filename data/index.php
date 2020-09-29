@@ -1,7 +1,6 @@
 <?php
 ?>
 <!doctype html>
-1
 <html>
     <head>
         <title>LEDControl</title>
