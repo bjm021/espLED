@@ -5,7 +5,6 @@
     <head>
         <title>LEDControl</title>
         <meta charset="UTF-8">
-
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
               integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
               crossorigin="anonymous">
@@ -19,7 +18,7 @@
         <style>
             #RGB {
                 height: 10vh;
-                background: rgb(128, 128, 128);
+                background: rgb(0, 0, 0);
             }
 
             #RC .slider-selection {
@@ -96,6 +95,9 @@
             </div>
         </nav>
 
+
+
+
         <br><br><br>
 
         <div class="container">
@@ -171,6 +173,8 @@
         </div>
 
 
+        <a hidden id="currentColor">FF1212</a>
+
         <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
                 integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
@@ -187,6 +191,11 @@
 
         <script>
 
+
+            let currentColor = document.getElementById("currentColor").innerHTML;
+            let currentR = parseInt(currentColor.substr(0, 2), 16);
+            let currentG = parseInt(currentColor.substr(2, 2), 16);
+            let currentB = parseInt(currentColor.substr(4, 2), 16);
 
             var colors = [];
 
@@ -238,14 +247,6 @@
                 });
             }
 
-
-
-            $( document ).ready(function() {
-                console.log("ready");
-                readColors();
-            });
-
-
             // Simple example, see optional options for more configuration.
             const pickr = Pickr.create({
                 el: '.color-picker',
@@ -272,6 +273,8 @@
 
                 components: {
 
+
+
                     // Main components
                     preview: true,
                     opacity: true,
@@ -290,6 +293,25 @@
                     }
                 }
             });
+
+
+
+
+            $( document ).ready(function() {
+                console.log("ready");
+                readColors();
+
+                pickr.setColor('#' + currentColor);
+                $('#R,#G,#B').css("background-color", "rgb(" + currentR + "," + currentG + "," + currentB + ");");
+            });
+
+
+            console.log(parseInt(currentColor.substr(0, 2), 16))
+            console.log(parseInt(currentColor.substr(2, 2), 16))
+            console.log(parseInt(currentColor.substr(4, 2), 16))
+
+
+
 
         </script>
     </body>
