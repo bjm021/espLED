@@ -12,7 +12,7 @@ const int resolution = 8;
 #include "SPIFFS.h"
 
 // Replace with your network credentials
-const char* ssid = "Meyerless Unity";
+const char* ssid = "Meyerless NextGen";
 const char* password = "*Quitte123*";
 
 // Create AsyncWebServer object on port 80
