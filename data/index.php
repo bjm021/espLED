@@ -5,6 +5,9 @@
     <head>
         <title>LEDControl</title>
         <meta charset="UTF-8">
+        <meta name='viewport'
+              content='width=device-width, initial-scale=1.0, maximum-scale=1.0,
+     user-scalable=0' >
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
               integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
               crossorigin="anonymous">
@@ -18,7 +21,7 @@
         <style>
             #RGB {
                 height: 10vh;
-                background: rgb(0, 0, 0);
+                /*background: rgb(0, 0, 0);*/
             }
 
             #RC .slider-selection {
@@ -98,11 +101,11 @@
 
 
 
-        <br><br><br>
+        <br>
 
         <div class="container">
             <div class="row">
-                <div class="col-6">
+                <div class="col-lg-6 col-sm-12">
                     <div class="card">
                         <div class="card-body">
 
@@ -132,7 +135,7 @@
                             <hr>
 
                             <div class="form-group">
-                                <label for="exampleInputEmail1">Save Color</label>
+                                <label for="cName">Save Color</label>
                                 <input onkeyup="updateSaveInput()" type="text" class="form-control" id="cName"
                                        aria-describedby="cNameH">
                                 <small id="cNameH" class="form-text text-muted">Enter the name of the color.</small>
@@ -143,7 +146,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-6">
+                <div class="col-lg-6 col-sm-12">
                     <div class="card">
                         <div class="card-body">
 
@@ -152,6 +155,8 @@
                             <div id="existingColors">
 
                             </div>
+
+                            <small>Click on one of the above colors to activate them and switch to them immediately!</small>
 
                         </div>
                     </div>
@@ -165,11 +170,53 @@
 
                             <div id="cpicker" class="color-picker"></div>
 
+                            <hr>
+
+                            <div class="form-group">
+                                <label for="cpName">Save Color</label>
+                                <input onkeyup="updatePickerSaveInput()" type="text" class="form-control" id="cpName"
+                                       aria-describedby="cpNameH">
+                                <small id="cpNameH" class="form-text text-muted">Enter the name of the color.</small>
+                            </div>
+                            <button id="saveColorPickerButton" type="submit" class="btn btn-secondary">Save Color</button>
+
 
                         </div>
                     </div>
                 </div>
             </div>
+
+
+            <footer class="pt-4 my-md-5 pt-md-5 border-top">
+                <div class="row">
+                    <div class="col-12 col-md">
+                        <a href="https://bjmsw.net"><img class="mb-2" src="https://bjmsw.net/images/logo.png" alt="" width="250" ></a>
+                        <small class="d-block mb-3 text-muted">© 2020 bjm SoftwareWorks</small>
+                    </div>
+                    <div class="col-6 col-md">
+                        <h5>Features</h5>
+                        <ul class="list-unstyled text-small">
+                            <li><a class="text-muted" href="#">Color Control</a></li>
+
+                        </ul>
+                    </div>
+                    <div class="col-6 col-md">
+                        <h5>Resources</h5>
+                        <ul class="list-unstyled text-small">
+                            <li><a class="text-muted" href="https://bjmsw.xyz/azesp">ESP32 Datasheet</a></li>
+                            <li><a class="text-muted" href="https://www.arduino.cc/en/Main/Software">Arduino IDE</a></li>
+                            <li><a class="text-muted" href="https://en.cppreference.com/w/">C++ (CPP) Reference</a></li>
+                            <li><a class="text-muted" href="https://en.cppreference.com/w/c">C ettReference</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-6 col-md">
+                        <h5>About</h5>
+                        <ul class="list-unstyled text-small">
+                            <li><a class="text-muted" href="https://bjmsw.net">BJMSW</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </footer>
         </div>
 
 
@@ -185,7 +232,6 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/bootstrap-slider.min.js"
                 integrity="sha512-f0VlzJbcEB6KiW8ZVtL+5HWPDyW1+nJEjguZ5IVnSQkvZbwBt2RfCBY0CBO1PsMAqxxrG4Di6TfsCPP3ZRwKpA=="
                 crossorigin="anonymous"></script>
-        <script>
         <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.es5.min.js"></script>
 
@@ -222,6 +268,16 @@
                 } else {
                     document.getElementById("saveColorButton").classList.add("btn-secondary");
                     document.getElementById("saveColorButton").classList.remove("btn-success");
+                }
+            }
+
+            function updatePickerSaveInput() {
+                if (document.getElementById("cpName").value !== "") {
+                    document.getElementById("saveColorPickerButton").classList.remove("btn-secondary");
+                    document.getElementById("saveColorPickerButton").classList.add("btn-success");
+                } else {
+                    document.getElementById("saveColorPickerButton").classList.add("btn-secondary");
+                    document.getElementById("saveColorPickerButton").classList.remove("btn-success");
                 }
             }
 
@@ -283,10 +339,6 @@
                     // Input / output Options
                     interaction: {
                         hex: true,
-                        rgba: true,
-                        hsla: true,
-                        hsva: true,
-                        cmyk: true,
                         input: true,
                         clear: true,
                         save: true
@@ -301,8 +353,11 @@
                 console.log("ready");
                 readColors();
 
+                document.getElementById("RGB").style.backgroundColor = '#' + currentColor;
+                $('#R').attr('data-slider-value', currentR);
+
                 pickr.setColor('#' + currentColor);
-                $('#R,#G,#B').css("background-color", "rgb(" + currentR + "," + currentG + "," + currentB + ");");
+
             });
 
 
