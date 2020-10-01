@@ -1,9 +1,5 @@
-// the number of the LED pin
-const int ledPin = 16;  // 16 corresponds to GPIO16
-
 // setting PWM properties
 const int freq = 5000;
-const int ledChannel = 0;
 const int resolution = 8;
 
 // Import required libraries
@@ -18,36 +14,33 @@ const char* password = "*Quitte123*";
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
 
+//current colot storage
+int currentR = 0;
+int currentG = 0;
+int currentB = 0;
 
-// Stores LED state
-String ledState;
+
 
 
 // Replaces placeholder with LED state value
 String processor(const String& var){
-  Serial.println(var);
-  if(var == "STATE"){
-    if(digitalRead(ledPin)){
-      ledState = "ON";
-    }
-    else{
-      ledState = "OFF";
-    }
-    Serial.print(ledState);
-    return ledState;
+  if(var == "CurSliR"){
+    return String(currentR);
+  } if(var == "CurSliG"){
+    return String(currentG);
+  } if(var == "CurSliB"){
+    return String(currentB);
   }
 
-  if(var == "REDIRECT"){
-    if(digitalRead(ledPin)){
-      ledState = "off";
-    }
-    else{
-      ledState = "on";
-    }
-    Serial.print(ledState);
-    return ledState;
+  if(var == "CurR"){
+    return String(currentR);
+  } if(var == "CurG"){
+    return String(currentG);
+  } if(var == "CurB"){
+    return String(currentB);
   }
-  
+
+ 
   return String();
 }
 
@@ -59,10 +52,16 @@ void setup(){
   Serial.begin(115200);
   
   // configure LED PWM functionalitites
-  ledcSetup(ledChannel, freq, resolution);
+  ledcSetup(0, freq, resolution);
+  ledcSetup(1, freq, resolution);
+  ledcSetup(2, freq, resolution);
+  ledcSetup(3, freq, resolution);
   
   // attach the channel to the GPIO to be controlled
-  ledcAttachPin(ledPin, ledChannel);
+  ledcAttachPin(16, 0);
+  ledcAttachPin(17, 1);
+  ledcAttachPin(18, 2);
+  ledcAttachPin(19, 3);
 
   // Initialize SPIFFS
   if(!SPIFFS.begin(true)){
@@ -86,11 +85,13 @@ void setup(){
   });
   
   // Route to load style.css file
-  server.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/style.css", "text/css");
+  server.on("/colors.json", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/colors.json", "application/json");
   });
 
 
+
+  
 
 
   // Route to set
@@ -98,13 +99,24 @@ void setup(){
 
 
 
-    AsyncWebParameter* p = request->getParam(0);
+    AsyncWebParameter* r = request->getParam(0);
+    AsyncWebParameter* g = request->getParam(1);
+    AsyncWebParameter* b = request->getParam(2);
+
+    
     
     Serial.print("Param value: ");
-    Serial.println(p->value());
+    Serial.println("R: " + r->value() + ", G: " + g->value() + ", B: " + b->value());
 
+    ledcWrite(0, r->value().toInt());
+    ledcWrite(1, g->value().toInt());
+    ledcWrite(2, b->value().toInt());
 
-    ledcWrite(ledChannel, p->value().toInt());
+    currentR = r->value().toInt();
+    currentG = g->value().toInt();
+    currentB = b->value().toInt();
+
+    //ledcWrite(ledChannel, p->value().toInt());
     
       
     request->send(SPIFFS, "/index.html", String(), false, processor);
@@ -119,5 +131,9 @@ void setup(){
   
   
 void loop(){
-  
+  String stringR =  String(currentR, HEX);   
+  String stringG =  String(currentG, HEX);   
+  String stringB =  String(currentB, HEX);   
+  Serial.println("#" + stringR + stringG + stringB);
+  delay(1000);
 }

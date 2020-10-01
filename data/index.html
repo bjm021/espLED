@@ -115,19 +115,19 @@
                             <p>
                                 <b>R&nbsp;&nbsp;</b> <input type="text" class="span2" value="" data-slider-min="0"
                                                             data-slider-max="255" data-slider-step="1"
-                                                            data-slider-value="0" data-slider-id="RC" id="R"
+                                                            data-slider-value="%CurSliR%" data-slider-id="RC" id="R"
                                                             data-slider-tooltip="hide" data-slider-handle="square"/>
                             </p>
                             <p>
                                 <b>G&nbsp;&nbsp;</b> <input type="text" class="span2" value="" data-slider-min="0"
                                                             data-slider-max="255" data-slider-step="1"
-                                                            data-slider-value="0" data-slider-id="GC" id="G"
+                                                            data-slider-value="%CurSliG%" data-slider-id="GC" id="G"
                                                             data-slider-tooltip="hide" data-slider-handle="round"/>
                             </p>
                             <p>
                                 <b>B&nbsp;&nbsp;</b> <input type="text" class="span2" value="" data-slider-min="0"
                                                             data-slider-max="255" data-slider-step="1"
-                                                            data-slider-value="0" data-slider-id="BC" id="B"
+                                                            data-slider-value="%CurSliB%" data-slider-id="BC" id="B"
                                                             data-slider-tooltip="hide" data-slider-handle="triangle"/>
                             </p>
                             <div id="RGB"></div>
@@ -221,6 +221,9 @@
 
 
         <a hidden id="currentColor">FF1212</a>
+        <a hidden id="curR">%CurR%</a>
+        <a hidden id="curG">%CurG%</a>
+        <a hidden id="curB">%CurB%</a>
 
         <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
@@ -239,15 +242,32 @@
 
 
             let currentColor = document.getElementById("currentColor").innerHTML;
-            let currentR = parseInt(currentColor.substr(0, 2), 16);
-            let currentG = parseInt(currentColor.substr(2, 2), 16);
-            let currentB = parseInt(currentColor.substr(4, 2), 16);
+            let currentR = document.getElementById("curR").innerText;
+            let currentG = document.getElementById("curG").innerText;
+            let currentB = document.getElementById("curB").innerText;
 
             var colors = [];
 
+            var rgbToHex = function (rgb) {
+                var hex = Number(rgb).toString(16);
+                if (hex.length < 2) {
+                    hex = "0" + hex;
+                }
+                return hex;
+            };
+
 
             var RGBChange = function () {
-                $('#RGB').css('background', 'rgb(' + r.getValue() + ',' + g.getValue() + ',' + b.getValue() + ')')
+                $('#RGB').css('background', 'rgb(' + r.getValue() + ',' + g.getValue() + ',' + b.getValue() + ')');
+
+                $.get({
+                    url: "/set",
+                    data: {
+                        r: r.getValue(),
+                        g: g.getValue(),
+                        b: b.getValue()
+                    }
+                })
             };
 
             var r = $('#R').slider()
@@ -350,20 +370,22 @@
 
 
             $( document ).ready(function() {
+                let hex = rgbToHex(currentR) + rgbToHex(currentG) + rgbToHex(currentB);
+                document.getElementById("currentColor").innerHTML = hex;
+
+                currentColor = hex;
+
                 console.log("ready");
                 readColors();
 
                 document.getElementById("RGB").style.backgroundColor = '#' + currentColor;
-                $('#R').attr('data-slider-value', currentR);
 
                 pickr.setColor('#' + currentColor);
 
             });
 
 
-            console.log(parseInt(currentColor.substr(0, 2), 16))
-            console.log(parseInt(currentColor.substr(2, 2), 16))
-            console.log(parseInt(currentColor.substr(4, 2), 16))
+
 
 
 
