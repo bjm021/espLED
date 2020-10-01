@@ -8,8 +8,8 @@ const int resolution = 8;
 #include "SPIFFS.h"
 
 // Replace with your network credentials
-const char* ssid = "Meyerless NextGen";
-const char* password = "*Quitte123*";
+const char* ssid = "LEDNet";
+const char* password = "22302992835916202786";
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
@@ -18,6 +18,7 @@ AsyncWebServer server(80);
 int currentR = 0;
 int currentG = 0;
 int currentB = 0;
+int currentA = 0;
 
 
 
@@ -30,6 +31,8 @@ String processor(const String& var){
     return String(currentG);
   } if(var == "CurSliB"){
     return String(currentB);
+  }  if(var == "CurSliA"){
+    return String(currentA);
   }
 
   if(var == "CurR"){
@@ -38,6 +41,8 @@ String processor(const String& var){
     return String(currentG);
   } if(var == "CurB"){
     return String(currentB);
+  } if(var == "CurA"){
+    return String(currentA);
   }
 
  
@@ -72,8 +77,9 @@ void setup(){
   // Connect to Wi-Fi
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
     Serial.println("Connecting to WiFi..");
+    Serial.println(WiFi.status());
+    delay(1000);
   }
 
   // Print ESP32 Local IP Address
@@ -88,6 +94,8 @@ void setup(){
   server.on("/colors.json", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(SPIFFS, "/colors.json", "application/json");
   });
+
+  
 
 
 
@@ -116,10 +124,29 @@ void setup(){
     currentG = g->value().toInt();
     currentB = b->value().toInt();
 
+    if (request->params() > 3) {
+      AsyncWebParameter* a = request->getParam(3);
+      ledcWrite(3, a->value().toInt());
+      currentA = a->value().toInt();
+    }
+
+    
+
     //ledcWrite(ledChannel, p->value().toInt());
     
       
     request->send(SPIFFS, "/index.html", String(), false, processor);
+  });
+
+
+  // Route to set
+  server.on("/setA", HTTP_GET, [](AsyncWebServerRequest *request){
+
+  AsyncWebParameter* a = request->getParam(0);
+  ledcWrite(3, a->value().toInt());
+  currentA = a->value().toInt();
+
+  request->send(SPIFFS, "/index.html", String(), false, processor);
   });
 
   // Start server
@@ -128,12 +155,10 @@ void setup(){
 
 
 
+
+
   
   
 void loop(){
-  String stringR =  String(currentR, HEX);   
-  String stringG =  String(currentG, HEX);   
-  String stringB =  String(currentB, HEX);   
-  Serial.println("#" + stringR + stringG + stringB);
-  delay(1000);
+ 
 }

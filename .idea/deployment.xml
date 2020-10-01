@@ -1,18 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="all inkl Ben" remoteFilesAllowedToDisappearOnAutoupload="false">
+  <component name="PublishConfigData" autoUpload="Always" serverName="all inkl Ben Neu" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
-      <paths name="all inkl Ben">
+      <paths name="all inkl Ben Neu">
         <serverdata>
           <mappings>
             <mapping deploy="/led.bjmsw.xyz" local="$PROJECT_DIR$/data" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="w00b1b4e.kasserver.com">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>

@@ -48,7 +48,16 @@
                 border-bottom-color: blue;
             }
 
-            #R, #G, #B {
+            #AC .slider-selection {
+                background: #FFFF00;
+            }
+
+            #AC .slider-handle {
+                border-bottom-color: #777700;
+                background: #FFFF00;
+            }
+
+            #R, #G, #B, #A {
                 width: 300px;
             }
 
@@ -129,6 +138,12 @@
                                                             data-slider-max="255" data-slider-step="1"
                                                             data-slider-value="%CurSliB%" data-slider-id="BC" id="B"
                                                             data-slider-tooltip="hide" data-slider-handle="triangle"/>
+                            </p>
+                            <p>
+                                <b>A&nbsp;&nbsp;</b> <input type="text" class="span2" value="" data-slider-min="0"
+                                                            data-slider-max="255" data-slider-step="1"
+                                                            data-slider-value="%CurSliA%" data-slider-id="AC" id="A"
+                                                            data-slider-tooltip="hide" data-slider-handle="round"/>
                             </p>
                             <div id="RGB"></div>
 
@@ -224,6 +239,7 @@
         <a hidden id="curR">%CurR%</a>
         <a hidden id="curG">%CurG%</a>
         <a hidden id="curB">%CurB%</a>
+        <a hidden id="curA">%CurA%</a>
 
         <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
@@ -256,28 +272,44 @@
                 return hex;
             };
 
+            let YChange = function () {
+                setTimeout(function () {
+                    $.get({
+                        url: "/setA",
+                        data: {
+                            a: a.getValue()
+                        }
+                    })
+                }, 1000)
+            }
+
 
             var RGBChange = function () {
                 $('#RGB').css('background', 'rgb(' + r.getValue() + ',' + g.getValue() + ',' + b.getValue() + ')');
 
-                $.get({
-                    url: "/set",
-                    data: {
-                        r: r.getValue(),
-                        g: g.getValue(),
-                        b: b.getValue()
-                    }
-                })
+                setTimeout(function () {
+                    $.get({
+                        url: "/set",
+                        data: {
+                            r: r.getValue(),
+                            g: g.getValue(),
+                            b: b.getValue()
+                        }
+                    })
+                }, 1000)
             };
 
             var r = $('#R').slider()
-                .on('slide', RGBChange)
+                .on('change', RGBChange)
                 .data('slider');
             var g = $('#G').slider()
-                .on('slide', RGBChange)
+                .on('change', RGBChange)
                 .data('slider');
             var b = $('#B').slider()
-                .on('slide', RGBChange)
+                .on('change', RGBChange)
+                .data('slider');
+            var a = $('#A').slider()
+                .on('change', YChange)
                 .data('slider');
 
 
@@ -310,11 +342,15 @@
                             var item = json[key];
                             colors.push({
                                 name: item.name,
-                                rgb: item.rgb
+                                r: item.r,
+                                g: item.g,
+                                b: item.b,
+                                a: item.a
                             });
 
+                            let tmpHex = rgbToHex(item.r) + rgbToHex(item.g) + rgbToHex(item.b);
 
-                            document.getElementById("existingColors").innerHTML += "<a href=\"/getColor?name=" + item.name + "\" class=\"btn btn-secondary\" style=\"background-color: #" + item.rgb + "\">" + item.name + "</a>&nbsp;";
+                            document.getElementById("existingColors").innerHTML += "<a href=\"/set?r=" + item.r + "&g=" + item.g + "&b=" + item.b + "&a=" + item.a + "\" class=\"btn btn-secondary\" style=\"background-color: #" + tmpHex + "\">" + item.name + "</a>&nbsp;";
 
                         }
                     }
@@ -332,18 +368,18 @@
 
                 swatches: [
                     'rgba(244, 67, 54, 1)',
-                    'rgba(233, 30, 99, 0.95)',
-                    'rgba(156, 39, 176, 0.9)',
-                    'rgba(103, 58, 183, 0.85)',
-                    'rgba(63, 81, 181, 0.8)',
-                    'rgba(33, 150, 243, 0.75)',
-                    'rgba(3, 169, 244, 0.7)',
-                    'rgba(0, 188, 212, 0.7)',
-                    'rgba(0, 150, 136, 0.75)',
-                    'rgba(76, 175, 80, 0.8)',
-                    'rgba(139, 195, 74, 0.85)',
-                    'rgba(205, 220, 57, 0.9)',
-                    'rgba(255, 235, 59, 0.95)',
+                    'rgba(233, 30, 99, 1)',
+                    'rgba(156, 39, 176, 1)',
+                    'rgba(103, 58, 183, 1)',
+                    'rgba(63, 81, 181, 1)',
+                    'rgba(33, 150, 243, 1)',
+                    'rgba(3, 169, 244, 1)',
+                    'rgba(0, 188, 212, 1)',
+                    'rgba(0, 150, 136, 1)',
+                    'rgba(76, 175, 80, 1)',
+                    'rgba(139, 195, 74, 1)',
+                    'rgba(205, 220, 57, 1)',
+                    'rgba(255, 235, 59, 1)',
                     'rgba(255, 193, 7, 1)'
                 ],
 
@@ -353,17 +389,33 @@
 
                     // Main components
                     preview: true,
-                    opacity: true,
                     hue: true,
 
                     // Input / output Options
                     interaction: {
-                        hex: true,
                         input: true,
                         clear: true,
                         save: true
                     }
                 }
+            });
+
+            pickr.on('change', (color, instance) => {
+                console.log('change', color.toRGBA());
+                console.log('R: ' + color.toRGBA()[0] + ", G: " + color.toRGBA()[1] + ", B: " + color.toRGBA()[2]);
+
+                setTimeout(function() {
+                    $.get({
+                        url: "/set",
+                        data: {
+                            r: color.toRGBA()[0],
+                            g: color.toRGBA()[1],
+                            b: color.toRGBA()[2]
+                        }
+                    })
+                }, 1000);
+
+
             });
 
 
@@ -381,6 +433,9 @@
                 document.getElementById("RGB").style.backgroundColor = '#' + currentColor;
 
                 pickr.setColor('#' + currentColor);
+
+                window.history.replaceState({}, document.title, "/" + "");
+
 
             });
 
