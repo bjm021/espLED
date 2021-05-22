@@ -7,7 +7,7 @@ Simple and powerful way to manage LED Colors via the esp32 coded with the Arduin
 - RGBA Slider adjustments
 - Color Picker adjustment
 - Save colors with names
-- Load saved colors
+- Load saved colors (Save will be added soon)
 
 ## Future Features
 - Fade effekt
