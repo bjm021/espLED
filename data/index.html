@@ -335,9 +335,12 @@
                 if (document.getElementById("cName").value !== "") {
                     document.getElementById("saveColorButton").classList.remove("btn-secondary");
                     document.getElementById("saveColorButton").classList.add("btn-success");
+                    $('#saveColorButton').unbind('click');
+                    $('#saveColorButton').click(saveDirect);
                 } else {
                     document.getElementById("saveColorButton").classList.add("btn-secondary");
                     document.getElementById("saveColorButton").classList.remove("btn-success");
+                    $('#saveColorButton').unbind('click');
                 }
             }
 
@@ -457,6 +460,37 @@
 
             });
 
+
+            function saveDirect() {
+                let name = document.getElementById("cName").value;
+                let rv = r.getValue();
+                let gv = g.getValue();
+                let bv = b.getValue();
+                let av = a.getValue();
+                console.log("Saving: " + name + " : " + rv + " " + gv + " " + bv + " " + av);
+
+                $.getJSON('colors.json', function (json) {
+                    console.log(json);
+                    let tmp = {};
+                    tmp["name"] = name;
+                    tmp["r"] = rv;
+                    tmp["g"] = gv;
+                    tmp["b"] = bv;
+                    tmp["a"] = av;
+                    json.push(tmp);
+
+
+                    $.get({
+                        url: '/saveColor',
+                        data: {
+                            json: JSON.stringify(json)
+                        },
+                        success: function () {
+                            window.location.reload(true);
+                        }
+                    })
+                });
+            }
 
 
 

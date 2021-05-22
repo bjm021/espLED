@@ -1,20 +1,20 @@
-/* 
+/*
   Copyright (C) 2021 Benjamin J. Meyer
-  
+
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   This program is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
- 
- */
+
+*/
 // setting PWM properties
 const int freq = 5000;
 const int resolution = 8;
@@ -62,23 +62,23 @@ String processor(const String& var){
     return String(currentA);
   }
 
- 
+
   return String();
 }
 
 
 
 
- 
+
 void setup(){
   Serial.begin(115200);
-  
+
   // configure LED PWM functionalitites
   ledcSetup(0, freq, resolution);
   ledcSetup(1, freq, resolution);
   ledcSetup(2, freq, resolution);
   ledcSetup(3, freq, resolution);
-  
+
   // attach the channel to the GPIO to be controlled
   ledcAttachPin(16, 0);
   ledcAttachPin(17, 1);
@@ -106,17 +106,17 @@ void setup(){
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(SPIFFS, "/index.html", String(), false, processor);
   });
-  
+
   // Route to load style.css file
   server.on("/colors.json", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(SPIFFS, "/colors.json", "application/json");
   });
 
-  
 
 
 
-  
+
+
 
 
   // Route to set
@@ -128,8 +128,8 @@ void setup(){
     AsyncWebParameter* g = request->getParam(1);
     AsyncWebParameter* b = request->getParam(2);
 
-    
-    
+
+
     Serial.print("Param value: ");
     Serial.println("R: " + r->value() + ", G: " + g->value() + ", B: " + b->value());
 
@@ -147,11 +147,11 @@ void setup(){
       currentA = a->value().toInt();
     }
 
-    
+
 
     //ledcWrite(ledChannel, p->value().toInt());
-    
-      
+
+
     request->send(SPIFFS, "/index.html", String(), false, processor);
   });
 
@@ -166,6 +166,24 @@ void setup(){
   request->send(SPIFFS, "/index.html", String(), false, processor);
   });
 
+  server.on("/saveColor", HTTP_GET, [](AsyncWebServerRequest *request){
+
+    AsyncWebParameter* json = request->getParam(0);
+
+    Serial.print("Trying to add new COLOR!");
+
+    File file = SPIFFS.open("/colors.json", FILE_WRITE);
+
+    if (file.print(String(json->value()))) {
+        Serial.println("File was written");
+    } else {
+        Serial.println("File write failed");
+    }
+
+    request->send(SPIFFS, "/index.html", String(), false, processor);
+
+  });
+
   // Start server
   server.begin();
 }
@@ -174,8 +192,8 @@ void setup(){
 
 
 
-  
-  
+
+
 void loop(){
- 
+
 }
