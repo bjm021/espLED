@@ -1,4 +1,5 @@
 # espLED
+## Checkout [espLed2](https://github.com/bjm021/espLed2) the successor of this project using with UDP instead of TCP!
 ![espLED Interface](https://cdn.bjmsw.net/espled.png)
 Simple and powerful way to manage LED Colors via the esp32 coded with the Arduino IDE, HTML and JavaScript.
 
